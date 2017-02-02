@@ -88,6 +88,13 @@ get '/team' do
 end
 
 get '/products' do
+  DATA = HTTParty.get("https://fomotograph-api.udacity.com/products.json")["photos"]
+  LOCATIONS = ['canada', 'england', 'france', 'ireland', 'mexico', 'scotland', 'taiwan', 'us']
+  @products = []
+  LOCATIONS.each do |location|
+    @products << DATA.select { |product| product["location"] == location }.sample
+  end
+
   # PRODUCTS PAGE LISTING ALL THE PRODUCTS
   erb "<!DOCTYPE html>
   <html>
@@ -107,22 +114,18 @@ get '/products' do
         <a href='/products' class='nav'>Products</a>
       </div>
 
-      <% DATA = HTTParty.get('https://fomotograph-api.udacity.com/products.json')['photos'] %>
-
       <div id='main'>
         <h1> All Products </h1>
         <div id='wrapper'>
 
-          <% LOCATIONS = ['canada', 'england', 'france', 'ireland', 'mexico', 'scotland', 'taiwan', 'us'] %>
-
-          <% LOCATIONS.each do |location| %>
-          <a href='/products/location/<%= location %>'>
+          <% @products.each do |product| %>
+          <a href='/products/location/<%= product['location'] %>'>
           <div class='product'>
             <div class='thumb'>
-              <img src='<%= DATA.select { |product| product['location'] == location }.sample['url'] %>' />
+              <img src='<%= procuct['url'] %>' />
             </div>
             <div class='caption'>
-              <%= location != 'us' ? location.capitalize : location.upcase %>
+              <%= product['location'] != 'us' ? product['location'].capitalize : product['location'].upcase %>
             </div>
           </div>
           </a>
@@ -142,6 +145,9 @@ get '/products' do
 end
 
 get '/products/location/:location' do
+  DATA = HTTParty.get("https://fomotograph-api.udacity.com/products.json")["photos"]
+  @products << DATA.select { |product| product["location"] == location }
+
   # PAGE DISPLAYING ALL PHOTOS FROM ONE LOCATION
   erb "<!DOCTYPE html>
   <html>
@@ -163,14 +169,10 @@ get '/products/location/:location' do
 
       <div id='main'>
 
-        <% DATA = HTTParty.get('https://fomotograph-api.udacity.com/products.json')['photos'] %>
-
         <h1> <%= params[:location] != 'us' ? params[:location].capitalize : params[:location].upcase %> </h1>
         <div id='wrapper'>
 
-        <% products = DATA.select{ |product| product['location'] == params[:location] } %>
-
-        <% products.each do |product| %>
+        <% @products.each do |product| %>
           <a href='/products/<%= product['id'] %>'>
           <div class='product'>
             <div class='thumb'>
@@ -198,13 +200,14 @@ get '/products/location/:location' do
 end
 
 get '/products/:id' do
+  DATA = HTTParty.get("https://fomotograph-api.udacity.com/products.json")["photos"]
+  @product = DATA.select { |prod| prod["id"] == params[:id].to_i }.first
+
   # PAGE DISPLAYING ONE PRODUCT WITH A GIVEN ID
   erb "<!DOCTYPE html>
   <html>
   <head>
-    <% DATA = HTTParty.get('https://fomotograph-api.udacity.com/products.json')['photos'] %>
-    <% product = DATA.select { |prod| prod['id'] == params[:id].to_i }.first %>
-    <title>Fomotograph | <%= product['title'] %> </title>
+    <title>Fomotograph | <%= @product['title'] %> </title>
     <link rel='stylesheet' type='text/css' href='<%= url('/style.css') %>'>
     <link href='https://fonts.googleapis.com/css?family=Work+Sans:400,500,600' rel='stylesheet' type='text/css'>
   </head>
@@ -220,12 +223,12 @@ get '/products/:id' do
       </div>
 
       <div id='main'>
-        <h1><%= product['title'] %></h1>
+        <h1><%= @product['title'] %></h1>
         <a class='small-button' href='#'>Fomotograph Me!</a>
-        <p class='summary'> <%= product['summary'] %> </p>
-        <p class='summary'>Order your prints today for $<%= product['price'] %></p>
-        <img class='full' src='<%= product['url'] %>' />
-        <a class='small-button' href='/products/location/<%= product['location'] %>'> View All <%= product['location'] != 'us' ? product['location'].capitalize : product['location'].upcase %> Products </a>
+        <p class='summary'> <%= @product['summary'] %> </p>
+        <p class='summary'>Order your prints today for $<%= @product['price'] %></p>
+        <img class='full' src='<%= @product['url'] %>' />
+        <a class='small-button' href='/products/location/<%= @product['location'] %>'> View All <%= @product['location'] != 'us' ? @product['location'].capitalize : @product['location'].upcase %> Products </a>
       </div>
 
       <div id='footer'>
