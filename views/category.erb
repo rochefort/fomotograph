@@ -1,0 +1,18 @@
+<h1> <%= titlecase(params[:location]) %> </h1>
+<div id='wrapper'>
+
+<% @products.each do |product| %>
+  <a href='/products/<%= product.id %>'>
+  <div class='product'>
+    <div class='thumb'>
+      <img src='<%= product.url %>' />
+    </div>
+    <div class='caption'>
+      <%= product.title %>
+    </div>
+  </div>
+  </a>
+<% end %>
+
+</div>
+<a class='small-button' href='/products'> View All Products </a>

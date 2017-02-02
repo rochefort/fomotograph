@@ -1,0 +1,6 @@
+<h1><%= @product.title %></h1>
+<a class='small-button' href='#'>Fomotograph Me!</a>
+<p class='summary'> <%= @product.summary %> </p>
+<p class='summary'>Order your prints today for $<%= @product.price %></p>
+<img class='full' src='<%= @product.url %>' />
+<a class='small-button' href='/products/location/<%= @product.location %>'> View All <%= titlecase(@product.location) %> Products </a>
