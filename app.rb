@@ -1,6 +1,5 @@
-require 'sinatra'
-require 'HTTParty'
-require 'json'
+require "sinatra"
+require_relative "models/product"
 
 get '/' do
   # HOME LANDING PAGE SHOWING BANNER PHOTO, TITLE, AND SUBTITLE
@@ -88,13 +87,7 @@ get '/team' do
 end
 
 get '/products' do
-  DATA = HTTParty.get("https://fomotograph-api.udacity.com/products.json")["photos"]
-  LOCATIONS = ['canada', 'england', 'france', 'ireland', 'mexico', 'scotland', 'taiwan', 'us']
-  @products = []
-  LOCATIONS.each do |location|
-    @products << DATA.select { |product| product["location"] == location }.sample
-  end
-
+  @products = Product.all
   # PRODUCTS PAGE LISTING ALL THE PRODUCTS
   erb "<!DOCTYPE html>
   <html>
@@ -145,9 +138,7 @@ get '/products' do
 end
 
 get '/products/location/:location' do
-  DATA = HTTParty.get("https://fomotograph-api.udacity.com/products.json")["photos"]
-  @products << DATA.select { |product| product["location"] == location }
-
+  @products = Product.find_by_location(params[:location])
   # PAGE DISPLAYING ALL PHOTOS FROM ONE LOCATION
   erb "<!DOCTYPE html>
   <html>
@@ -201,8 +192,7 @@ end
 
 get '/products/:id' do
   DATA = HTTParty.get("https://fomotograph-api.udacity.com/products.json")["photos"]
-  @product = DATA.select { |prod| prod["id"] == params[:id].to_i }.first
-
+  @product = Product.find(params[:id])
   # PAGE DISPLAYING ONE PRODUCT WITH A GIVEN ID
   erb "<!DOCTYPE html>
   <html>
