@@ -34,3 +34,9 @@ get "/products/:id" do
   @page_title = @product.title
   erb :single
 end
+
+get "/deals" do
+  @products = Product.find_deals
+  @page_title = "Deals"
+  erb :deals
+end

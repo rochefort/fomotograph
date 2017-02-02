@@ -35,4 +35,8 @@ class Product
   def self.find(id)
     self.all.select { |product| product.id == id.to_i }.first
   end
+
+  def self.find_deals
+    self.all.select { |products| product.price < 10 }
+  end
 end
